@@ -3,7 +3,7 @@ import React, { Suspense, useState, useEffect } from 'react';
 import { Canvas, ThreeEvent } from '@react-three/fiber';
 import { useGLTF, OrbitControls, Stage } from '@react-three/drei';
 
-// --- 1. 3D MODEL COMPONENT (PRECISION SCALED) ---
+// --- 1. 3D MODEL COMPONENT ---
 function Model({ setHovered }: { setHovered: (hovered: boolean) => void }) {
   const { scene } = useGLTF('/camera.glb');
   const [scale, setScale] = useState(1.1);
@@ -23,15 +23,13 @@ function Model({ setHovered }: { setHovered: (hovered: boolean) => void }) {
       object={scene} 
       scale={scale} 
       position={[0, -0.4, 0]} 
-      onPointerOver={(e: ThreeEvent<PointerEvent>) => {
-        e.stopPropagation();
-        setHovered(true);
-      }}
+      onPointerOver={(e: ThreeEvent<PointerEvent>) => { e.stopPropagation(); setHovered(true); }}
       onPointerOut={() => setHovered(false)}
     />
   );
 }
 
+// --- 2. MAIN PAGE ---
 export default function CyberEyeMaster() {
   const [mounted, setMounted] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -48,7 +46,7 @@ export default function CyberEyeMaster() {
   const faqs = [
     { q: "Does the system work during power outages?", a: "Yes. When paired with our CyberEye Power-Vault UPS, the system maintains full recording capabilities for up to 4 hours." },
     { q: "Can I monitor the feed from my phone?", a: "Absolutely. Every CyberEye protocol includes encrypted remote access for Android, iOS, and MacOS with zero-latency streaming." },
-    { q: "How long is the data stored?", a: "Depending on your selection, a 4TB drive typically holds 30 days of 24/7 high-definition footage before overwriting." },
+    { q: "How long is the data stored?", a: "Depending on selection, a 4TB drive typically holds 30 days of 24/7 high-definition footage before overwriting." },
     { q: "Are the cameras weather-resistant?", a: "All CyberEye Optics are IP67-rated, meaning they are completely dust-tight and protected against heavy rain." },
     { q: "Is there a warranty on the installation?", a: "Every installation comes with a 1-year technical on-site support guarantee and a 2-year hardware replacement warranty." }
   ];
@@ -63,13 +61,7 @@ export default function CyberEyeMaster() {
 
   const handleRequestQuote = () => {
     const phoneNumber = "917204849998"; 
-    const message = `*CyberEye Configuration Request*%0A` +
-                    `------------------------------%0A` +
-                    `*Quantity:* ${specs.qty} Units%0A` +
-                    `*Protocol:* ${specs.tech}%0A` +
-                    `*Hard Drive:* ${specs.storage}%0A` +
-                    `------------------------------%0A` +
-                    `Please provide the final quote for this system.`;
+    const message = `*CyberEye Configuration Request*%0A------------------------------%0A*Quantity:* ${specs.qty} Units%0A*Protocol:* ${specs.tech}%0A*Hard Drive:* ${specs.storage}%0A------------------------------%0APlease provide the final quote.`;
     window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
   };
 
@@ -78,7 +70,7 @@ export default function CyberEyeMaster() {
   return (
     <main className="relative w-full bg-white font-sans selection:bg-black selection:text-white">
       
-      {/* HERO SECTION */}
+      {/* SECTION A: HERO 3D */}
       <section className="relative w-full h-[85vh] md:h-screen overflow-hidden border-b border-gray-100 bg-white">
         <nav className="absolute top-0 w-full p-6 md:p-10 flex flex-col md:flex-row justify-between items-center md:items-start z-40 gap-4 md:gap-0">
           <div className="flex flex-col items-center md:items-start">
@@ -89,15 +81,14 @@ export default function CyberEyeMaster() {
             <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse" />
             <span className="text-black font-mono text-[9px] tracking-[0.2em] uppercase font-bold">REC ● LIVE</span>
           </div>
-          <div className="hidden md:block text-right">
-            <div className="text-black font-mono text-[10px] tracking-widest uppercase font-bold">{time.toLocaleTimeString()}</div>
-            <div className="text-red-600 font-mono text-[8px] tracking-widest uppercase">SYSTEM: ONLINE</div>
+          <div className="hidden md:block text-right text-black font-mono text-[10px] uppercase font-bold">
+            {time.toLocaleTimeString()}
           </div>
         </nav>
 
-        {/* AUTHORIZED DEALER STRIP - INTEGRATED SMOOTHLY */}
+        {/* AUTHORIZED DEALER BAR */}
         <div className="absolute top-[22%] w-full flex justify-center z-40 px-4">
-          <div className="bg-white/50 backdrop-blur-sm border border-gray-100 px-4 py-2 flex items-center gap-4">
+          <div className="bg-white/50 backdrop-blur-sm border border-gray-100 px-4 py-2 flex items-center gap-4 rounded-sm">
             <span className="text-[7px] font-black uppercase tracking-[0.3em] text-gray-400">Authorized Dealer</span>
             <div className="flex gap-3 text-[9px] font-black italic uppercase text-black">
               <span>CP PLUS</span> <span className="text-red-600">/</span>
@@ -107,21 +98,18 @@ export default function CyberEyeMaster() {
           </div>
         </div>
 
-        <div className="absolute inset-0 z-0 mt-[-5vh] md:mt-0">
-          <Canvas shadows camera={{ position: [0, 0, 4], fov: 40 }} gl={{ antialias: true }}>
+        {/* 3D SCENE WITH ANDROID SCROLL FIX */}
+        <div className="absolute inset-0 z-0">
+          <Canvas shadows camera={{ position: [0, 0, 4], fov: 40 }} style={{ touchAction: 'pan-y' }}>
             <Suspense fallback={null}>
               <Stage environment="city" intensity={0.5} adjustCamera={false}><Model setHovered={setHovered} /></Stage>
             </Suspense>
-            <OrbitControls makeDefault enableZoom={false} autoRotate={!hovered} autoRotateSpeed={2.5} />
+            <OrbitControls makeDefault enableZoom={false} enablePan={false} autoRotate={!hovered} autoRotateSpeed={2.5} />
           </Canvas>
         </div>
 
-        <div className="absolute bottom-[35%] md:bottom-[45%] w-full text-center z-20 pointer-events-none">
-          <p className="text-[7px] md:text-[9px] font-mono text-red-600 uppercase tracking-[0.5em] opacity-80 animate-pulse">UPLINK SECURED // PACKETS: 1024kbps // ENCRYPTION: AES-256</p>
-        </div>
-
         <div className="absolute inset-0 flex flex-col justify-end md:justify-center items-center pb-24 md:pb-0 pointer-events-none z-10 text-center">
-          <h2 className={`text-5xl md:text-[120px] font-black tracking-[-0.07em] uppercase italic leading-[0.8] transition-all duration-700 select-none ${hovered ? 'text-red-600 scale-105 opacity-100' : 'text-black opacity-30'}`}>
+          <h2 className={`text-5xl md:text-[120px] font-black tracking-[-0.07em] uppercase italic leading-[0.8] transition-all duration-700 ${hovered ? 'text-red-600 scale-105 opacity-100' : 'text-black opacity-30'}`}>
             {hovered ? <>SENSORS<br />ACTIVE.</> : <>CYBER<br />EYE.</>}
           </h2>
         </div>
@@ -129,7 +117,7 @@ export default function CyberEyeMaster() {
         {hovered && <div className="absolute left-0 w-full h-[1px] bg-red-600 shadow-[0_0_15px_red] z-20 pointer-events-none animate-scan" />}
       </section>
 
-      {/* SPEC SELECTOR - YOUR EXACT STONE DESIGN */}
+      {/* SECTION B: SPEC SELECTOR */}
       <section className="bg-black text-white py-32 px-10 relative z-30">
         <div className="max-w-6xl mx-auto">
           <div className="mb-20 border-b border-white/10 pb-12">
@@ -147,7 +135,7 @@ export default function CyberEyeMaster() {
                 <div className="flex gap-4">{['HD-Analog', 'IP / NVR'].map(t => (<button key={t} onClick={() => setSpecs({...specs, tech: t})} className={`flex-1 py-4 border text-[10px] font-black transition-all ${specs.tech === t ? 'bg-white text-black border-white' : 'border-white/10 hover:border-white'}`}>{t}</button>))}</div>
               </div>
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-6 block italic">03. Hard Drive Capacity</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-6 block italic">03. Storage Capacity</label>
                 <div className="grid grid-cols-3 gap-4">{['1 TB', '2 TB', '4 TB', '6 TB', '8 TB', '10 TB'].map(size => (<button key={size} onClick={() => setSpecs({...specs, storage: size})} className={`py-4 border text-[10px] font-black transition-all ${specs.storage === size ? 'border-red-600 text-red-600' : 'border-white/10 hover:border-white'}`}>{size}</button>))}</div>
               </div>
             </div>
@@ -160,53 +148,61 @@ export default function CyberEyeMaster() {
                   <div className="flex justify-between items-end"><span className="text-[10px] font-bold uppercase text-gray-600 tracking-widest">Warranty</span><span className="text-sm font-black italic text-red-600">2 YEARS</span></div>
                 </div>
               </div>
-              <button onClick={handleRequestQuote} className="mt-16 w-full py-6 bg-white text-black font-black uppercase tracking-[0.2em] text-xs hover:bg-red-600 hover:text-white transition-all duration-500 shadow-xl">Request PRICE (WhatsApp)</button>
+              <button onClick={handleRequestQuote} className="mt-16 w-full py-6 bg-white text-black font-black uppercase tracking-[0.2em] text-xs hover:bg-red-600 hover:text-white transition-all shadow-xl">Request PRICE (WhatsApp)</button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* FIELD REPORTS - WITH YOUR STAR DESIGN */}
+      {/* SECTION C: FIELD REPORTS */}
       <section className="bg-white py-32 px-10 border-t border-gray-100 relative z-30">
         <div className="max-w-6xl mx-auto">
           <div className="mb-20"><p className="text-red-600 font-bold text-[10px] uppercase tracking-[0.4em] mb-4 italic">Step 02: Verification</p><h3 className="text-5xl font-black text-black tracking-tighter uppercase italic">Field Reports_</h3></div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {reviews.map((rev, i) => (
-              <div key={i} className="group p-8 border border-gray-100 hover:border-black transition-all duration-500 bg-gray-50/30">
+              <div key={i} className="group p-8 border border-gray-100 hover:border-black transition-all bg-gray-50/30">
                 <div className="flex gap-1 mb-6">{[...Array(5)].map((_, star) => (<div key={star} className="w-2 h-2 bg-red-600" />))}</div>
                 <p className="text-sm font-medium leading-relaxed text-gray-800 mb-8 italic">"{rev.text}"</p>
-                <div className="flex items-center justify-between border-t border-gray-100 pt-6">
-                  <div><p className="text-xs font-black uppercase tracking-tight">{rev.name}</p><p className="text-[10px] text-gray-400 uppercase tracking-widest">{rev.role}</p></div>
-                  <div className="text-[8px] font-bold text-red-600 border border-red-100 px-2 py-1 rounded-full uppercase tracking-tighter">Verified</div>
-                </div>
+                <div><p className="text-xs font-black uppercase tracking-tight">{rev.name}</p><p className="text-[10px] text-gray-400 uppercase tracking-widest">{rev.role}</p></div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CONTACT - UPDATED FROM CARD */}
-      <section className="bg-white border-t border-gray-100 py-16 px-10 relative z-30">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-          <div className="flex items-center gap-5">
-            <div className="text-red-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l2.27-2.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></div>
-            <div><p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Direct Lines</p><p className="text-sm font-black text-black italic leading-none">72048 49998 / 79757 45063</p></div>
-          </div>
-          <div className="flex items-center gap-5">
-            <div className="text-red-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>
-            <div><p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">HQ Address</p><p className="text-[11px] font-bold text-black leading-tight">Bommanahalli, Bangalore<br/>560 068</p></div>
-          </div>
-          <div className="flex items-center gap-5">
-            <div className="text-red-600"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12,6 12,12 16,14"></polyline></svg></div>
-            <div><p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Operating Hours</p><p className="text-sm font-black text-black italic leading-none">Mon-Sat: 9am – 7pm</p></div>
+      {/* STRATEGIC CLOSER */}
+      <section className="bg-black py-24 px-10 relative z-30 text-center border-y border-red-900/30">
+        <h3 className="text-white text-4xl md:text-6xl font-black tracking-tighter uppercase italic mb-8">Secure your <span className="text-red-600">Perimeter?</span></h3>
+        <button onClick={handleRequestQuote} className="px-12 py-6 bg-red-600 text-white font-black uppercase tracking-[0.2em] text-xs hover:bg-white hover:text-black transition-all shadow-2xl">Claim 20% Discount & Get Quote</button>
+      </section>
+
+      {/* SECTION D: FAQ */}
+      <section className="bg-gray-50 py-32 px-10 border-t border-gray-100 relative z-30">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-20 text-center"><p className="text-red-600 font-bold text-[10px] uppercase tracking-[0.4em] mb-4 italic">Technical Support</p><h3 className="text-5xl font-black text-black tracking-tighter uppercase italic">Intelligence Briefing_</h3></div>
+          <div className="space-y-6">
+            {faqs.map((faq, i) => (
+              <div key={i} className="group border border-gray-200 bg-white p-8 hover:border-black transition-all">
+                <h4 className="text-sm font-black uppercase tracking-tight text-black mb-3">{faq.q}</h4>
+                <p className="text-xs leading-relaxed text-gray-500 font-medium">{faq.a}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <footer className="bg-black py-24 px-10 text-center border-t border-gray-900">
-        <h4 className="text-white font-black text-5xl italic tracking-tighter uppercase mb-6 leading-none">CyberEye<br />Uncompromised.</h4>
-        <div className="w-24 h-[1px] bg-red-600 mx-auto mb-8"></div>
-        <p className="text-white font-mono text-[9px] tracking-[1.2em] uppercase opacity-40">CyberEye Protocol © 2026</p>
+      {/* FOOTER & CONTACT */}
+      <section className="bg-white border-t border-gray-100 py-16 px-10 relative z-30">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+          <div><p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Direct Lines</p><p className="text-sm font-black italic text-black">72048 49998 / 79757 45063</p></div>
+          <div><p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">HQ Address</p><p className="text-sm font-black italic text-black">Bommanahalli, Bangalore - 560 068</p></div>
+          <div><p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Status</p><p className="text-sm font-black italic text-red-600 uppercase">Always Watching</p></div>
+        </div>
+      </section>
+
+      <footer className="bg-black py-20 text-center">
+        <h4 className="text-white font-black text-4xl italic uppercase">CyberEye</h4>
+        <p className="text-white/30 font-mono text-[8px] tracking-[1em] uppercase mt-4">CyberEye Protocol © 2026</p>
       </footer>
 
       <style jsx global>{`
