@@ -2,16 +2,11 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "CyberEye Security Systems | Authorized Dealer Bangalore",
-  description: "Uncompromised CCTV solutions in Bangalore. Authorized dealer for CP Plus, Hikvision, and Dahua. Professional installation in Bommanahalli and beyond.",
-  keywords: "CyberEye Bangalore, CCTV Installation Bangalore, CP Plus Dealer, Hikvision Bangalore, Dahua CCTV, Security Systems ITI Layout",
+  title: "CyberEye Security Systems | Bangalore",
+  description: "Authorized dealer of CP Plus, Hikvision, and Dahua. Uncompromised CCTV solutions in Bommanahalli, Bangalore.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>{children}</body>
